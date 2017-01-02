@@ -594,18 +594,61 @@
   ;; todo: mettre sous forme disjunctive minimale
   (symb-xor `(and ,A ,B) `(and ,Cin  ,(symb-xor A B))))
 
+;; > (goodstein 3)
+;; b = 2
+;; hi = (2 + 1)
+;; n = 3
 
+;; b = 3
+;; hi = 3
+;; n = 3
+
+;; b = 4
+;; hi = 3
+;; n = 2
+
+;; b = 5
+;; hi = 2
+;; n = 1
+
+;; b = 6
+;; hi = 1
+;; n = 0
+;;
+;;
+;; > (goodstein 266)
+;; b = 2
+;; hi = ((2 ^ (2 ^ (2 + 1))) + (2 ^ (2 + 1)) + 2)
+
+;; b = 3
+;; hi = ((3 ^ (3 ^ (3 + 1))) + (3 ^ (3 + 1)) + 2)
+
+;; b = 4
+;; hi = ((4 ^ (4 ^ (4 + 1))) + (4 ^ (4 + 1)) + 1)
+
+;; b = 5
+;; hi = ((5 ^ (5 ^ (5 + 1))) + (5 ^ (5 + 1)))
+
+;; b = 6
+;; . . ../git/LOGIKI/lib/binary_arithmetic.scm:330:21: user break
 (define (goodstein n)
 
   (let ((h '()) ;; hereditary base b
+	(hi '()) ;; infix
 	(hs '()) ;; hereditary base b+1
 	(b 2))
     
     (while (not (= n 0))
 
+	   (dv b)
 	   (set! h (number->hereditary-base-k-expt n b))
-	   (dv h)
-	   
-	   (set! n (eval h))
-	   (dv n))))
+	   (set! hi (number->hereditary-base-k-infix n b))
+	   (dv hi)
+	   (set! hs ;; bump the base
+		 (replace h (+ 1 b) b))
+	   ;;(dv hs)
+	   (set! b (+ 1 b))
+	   (set! n (- (eval hs) 1)) ;; substract 1
+	   ;;(dv n)
+	   (newline))))
 	 
