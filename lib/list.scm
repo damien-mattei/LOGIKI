@@ -58,3 +58,38 @@
 (define (remove-last lst)
   (reverse (rest (reverse lst))))
 
+;; > (replace '(1 (1 2 3 4 (5 6 3) 3 4)) 7 3)
+;; '(1 (1 2 7 4 (5 6 7) 7 4))
+;; > (replace '() 7 3)
+;; '()
+;; > (replace '(1 (1 2 3 4) 3 4) 7 3)
+;; '(1 (1 2 7 4) 7 4)
+;; (define (replace L new old)
+;;   (cond ;;((null? L) L)
+;; 	((list? L)
+;; 	 (map
+;; 	  (lambda (lst) (replace lst new old))
+;; 	  L))
+;; 	(else
+;; 	 (if (equal? L old)
+;; 	     new
+;; 	     L))))
+
+;; > (replace '(1 (1 2 3 4) 3 4) 7 3)
+;; '(1 (1 2 7 4) 7 4)
+;; > (replace '() 7 3)
+;; '()
+;; > (replace '(1 (1 2 3 4) 3 4) 7 3)
+;; '(1 (1 2 7 4) 7 4)
+;; > (replace '(1 (1 2 3 4 (5 6 3) 3 4)) 7 3)
+;; '(1 (1 2 7 4 (5 6 7) 7 4))
+(define (replace L new old)
+ 
+	(if (list? L)
+	    (map
+	     (lambda (lst) (replace lst new old))
+	     L)
+	    (if (equal? L old)
+		new
+		L)))
+

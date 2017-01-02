@@ -594,3 +594,18 @@
   ;; todo: mettre sous forme disjunctive minimale
   (symb-xor `(and ,A ,B) `(and ,Cin  ,(symb-xor A B))))
 
+
+(define (goodstein n)
+
+  (let ((h '()) ;; hereditary base b
+	(hs '()) ;; hereditary base b+1
+	(b 2))
+    
+    (while (not (= n 0))
+
+	   (set! h (number->hereditary-base-k-expt n b))
+	   (dv h)
+	   
+	   (set! n (eval h))
+	   (dv n))))
+	 
