@@ -16,6 +16,9 @@
 ;; Copyright (C) 2014-2016  Damien MATTEI
 ;;
 ;;
+;; damien.mattei@orange.fr
+;;
+;;
 ;;
 ;; version 2.1
 ;;
