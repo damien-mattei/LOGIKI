@@ -631,24 +631,142 @@
 
 ;; b = 6
 ;; . . ../git/LOGIKI/lib/binary_arithmetic.scm:330:21: user break
+;;
+;; G(13)(280)=(+ (expt 281 (+ 281 1)) (* 3 (expt 281 3)) (* 2 (expt 281 2)) (* 61 281) 230)
+;;
+;; test with 257
 (define (goodstein n)
 
-  (let ((h '()) ;; hereditary base b
+  (let ((n-start n)
+	(h '()) ;; hereditary base b
 	(hi '()) ;; infix
 	(hs '()) ;; hereditary base b+1
+	(omega (string->symbol (string #\u03C9))) ;; omega symbol
+	
+	(hi-omega '()) ;; hereditary infix omega 
 	(b 2))
     
     (while (not (= n 0))
 
-	   (dv b)
+	   ;; dv : display variable
+	   ;;(display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
 	   (set! h (number->hereditary-base-k-expt n b))
-	   (set! hi (number->hereditary-base-k-infix n b))
-	   (dv hi)
+	   ;;(display-nl h)
+	   ;; convertir ,ne pas recalculer
+	   (set! hi (prefix->infix h))
+	   (set! hi
+		 (replace hi 'expt '^)) ;; expt))
+	   ;;(set! hi (number->hereditary-base-k-infix n b))
+	   (display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   (display-nl hi)
+	   (set! hi-omega 
+		 (replace hi b omega))
+	   (display "P(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   (display-nl hi-omega)
 	   (set! hs ;; bump the base
-		 (replace h (+ 1 b) b))
+		 (replace h b (+ 1 b)))
 	   ;;(dv hs)
 	   (set! b (+ 1 b))
 	   (set! n (- (eval hs) 1)) ;; substract 1
 	   ;;(dv n)
-	   (newline))))
-	 
+	   (newline))
+    
+    (display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+    (display-nl n)
+    (display "P(") (display n-start) (display ")(") (display (- b 1)) (display ")=0")))
+
+    
+
+;; G(13)(280)=(+ (expt 281 (+ 281 1)) (* 3 (expt 281 3)) (* 2 (expt 281 2)) (* 61 281) 230)
+(define (goodstein-optim n)
+
+  (let ((n-start n)
+	(h '()) ;; hereditary base b expression
+	(hi '()) ;; infix expression
+	(hs '()) ;; hereditary base b+1 expression
+	(omega (string->symbol (string #\u03C9))) ;; omega symbol
+	
+	(hi-omega '()) ;; hereditary infix omega 
+	(b 2)
+	(hs-rev '()) ;; reverse of base b+1 hereditary expression
+	(monomial '())
+	(monomial-1 '())
+	(hs-rev-rest '())
+	(hs-rev-result '())
+	)
+    
+    (while (not 
+	    (and (number? h)
+		 (= h 0)))
+
+	   ;; dv : display variable
+	   ;;(display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   
+	   (when (= 2 b) ;; only at the beginning
+		 (set! h (number->hereditary-base-k-expt n b)))
+
+	   ;;(display-nl h)
+	   
+	   ;; convertir ,ne pas recalculer
+	   (set! hi (prefix->infix h))
+	   (set! hi
+		 (replace hi 'expt '^)) ;; expt))
+	   ;;(set! hi (number->hereditary-base-k-infix n b))
+	   
+	   (display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   
+	   (display-nl hi)
+
+	   (set! hi-omega 
+		 (replace hi b omega))
+	   (display "P(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   (display-nl hi-omega)
+
+	   (set! hs ;; bump the base
+		 (replace h b (+ 1 b)))
+	   ;;(dv hs)
+
+	   (set! b (+ 1 b))
+
+	   ;;(set! n (- (eval hs) 1)) ;; substract 1
+	   
+	   (if (number? hs) ;; sometimes it's a number , not a list
+	       (set! h (- hs 1))
+	       (begin
+		 (set! hs-rev (reverse hs))
+		 ;;(dv hs-rev)
+		 (set! monomial (first hs-rev))
+		 ;;(dv monomial)
+		 (set! hs-rev-rest (rest hs-rev))
+		 ;;(dv hs-rev-rest)
+		 (set! monomial-1
+		       (number->hereditary-base-k-expt 
+			(- (eval monomial) 1)
+			b))
+		 ;;(dv monomial-1)
+		 (cond ((number? monomial-1)
+			(if (zero? monomial-1)
+			    (if (pair-list? hs-rev-rest)
+				(set! hs-rev-result (first hs-rev-rest))
+				(set! hs-rev-result hs-rev-rest))
+			    (set! hs-rev-result (insert monomial-1 hs-rev-rest))))
+		       ((is*? monomial-1)
+			(set! hs-rev-result (insert monomial-1 hs-rev-rest)))
+		       (else
+			(set! hs-rev-result
+			      (append
+			       (reverse (args monomial-1))
+			       hs-rev-rest))))
+		 
+		 (if (not (number? hs-rev-result))
+		     (set! h (reverse hs-rev-result))
+		     (set! h hs-rev-result))))
+	   
+	   ;;(dv n)
+	   (newline))
+
+    (display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+    (display-nl h)
+    (display "P(") (display n-start) (display ")(") (display (- b 1)) (display ")=0")
+    
+    )) 

@@ -13,6 +13,9 @@
 (define (only-one? expr)
   (null? (rest expr)))
 
+(define (pair-list? expr)
+  (and (list? expr) (only-one? (rest expr))))
+
 (define (empty? lst)
   (null? lst))
 
@@ -58,11 +61,11 @@
 (define (remove-last lst)
   (reverse (rest (reverse lst))))
 
-;; > (replace '(1 (1 2 3 4 (5 6 3) 3 4)) 7 3)
+;; > (replace '(1 (1 2 3 4 (5 6 3) 3 4)) 3 7)
 ;; '(1 (1 2 7 4 (5 6 7) 7 4))
-;; > (replace '() 7 3)
+;; > (replace '() 3 7)
 ;; '()
-;; > (replace '(1 (1 2 3 4) 3 4) 7 3)
+;; > (replace '(1 (1 2 3 4) 3 4) 3 7)
 ;; '(1 (1 2 7 4) 7 4)
 ;; (define (replace L new old)
 ;;   (cond ;;((null? L) L)
@@ -75,19 +78,21 @@
 ;; 	     new
 ;; 	     L))))
 
-;; > (replace '(1 (1 2 3 4) 3 4) 7 3)
+;; > (replace '(1 (1 2 3 4) 3 4) 3 7)
 ;; '(1 (1 2 7 4) 7 4)
 ;; > (replace '() 7 3)
 ;; '()
-;; > (replace '(1 (1 2 3 4) 3 4) 7 3)
+;; > (replace '(1 (1 2 3 4) 3 4) 3 7)
 ;; '(1 (1 2 7 4) 7 4)
-;; > (replace '(1 (1 2 3 4 (5 6 3) 3 4)) 7 3)
+;; > (replace '(1 (1 2 3 4 (5 6 3) 3 4)) 3 7)
 ;; '(1 (1 2 7 4 (5 6 7) 7 4))
-(define (replace L new old)
+;;
+;;  (replace 4 4 5) -> 5
+(define (replace L old new)
  
 	(if (list? L)
 	    (map
-	     (lambda (lst) (replace lst new old))
+	     (lambda (lst) (replace lst old new))
 	     L)
 	    (if (equal? L old)
 		new
