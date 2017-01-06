@@ -76,22 +76,22 @@
     (while (not (= n 0))
 
 	   ;; dv : display variable
-	   (display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   ;;(display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
 	   (set! h (number->hereditary-base-k-expt n b))
 	   ;;(display-nl h)
-	   (display-nl (eval h))
+	   ;;(display-nl (eval h))
 
 	   ;; convertir ,ne pas recalculer
 	   (set! hi (prefix->infix h))
 	   (set! hi
 		 (replace hi 'expt '^)) ;; expt))
 	   ;;(set! hi (number->hereditary-base-k-infix n b))
-	   ;;(display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
-	   ;;(display-nl hi)
+	   (display "G(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   (display-nl hi)
 	   (set! hi-omega 
 		 (replace hi b omega))
-	   ;;(display "P(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
-	   ;;(display-nl hi-omega)
+	   (display "P(") (display n-start) (display ")(") (display (- b 1)) (display ")=")
+	   (display-nl hi-omega)
 	   (set! hs ;; bump the base
 		 (replace h b (+ 1 b)))
 	   ;;(dv hs)
