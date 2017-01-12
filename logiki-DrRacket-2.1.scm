@@ -401,7 +401,7 @@
 
 ;; simplify expression A ^ F or A ^ T or A v T ....
 
-;; (prefix->infix-symb (simplify (n-arity (simplify-OR (simplify-AND (phase3-dnf (simplify-negation (move-in-negations (elim-implications  '(or (and Cin (not (or (and A (not #t)) (and (not A) #t)))) (and (not Cin) (or (and A (not #t)) (and (not A) #t))))))))))))) -> '((A ^ Cin) v (!A ^ !Cin))
+;; (prefix->infix-symb (simplify-logic (n-arity (simplify-OR (simplify-AND (phase3-dnf (simplify-negation (move-in-negations (elim-implications  '(or (and Cin (not (or (and A (not #t)) (and (not A) #t)))) (and (not Cin) (or (and A (not #t)) (and (not A) #t))))))))))))) -> '((A ^ Cin) v (!A ^ !Cin))
 (define (simplify-OR expr)
   (cond
    ((symbol? expr) expr) ; symbol , ex: 'a
@@ -421,7 +421,7 @@
 		 (else `(or ,p-simp ,q-simp)))))))))) ; (or p q) 
 
 
-;; (prefix->infix-symb (simplify (n-arity (simplify-OR (simplify-AND (phase3-dnf (simplify-negation (move-in-negations (elim-implications  '(or (and Cin (not (or (and A (not #t)) (and (not A) #t)))) (and (not Cin) (or (and A (not #t)) (and (not A) #t))))))))))))) -> '((A ^ Cin) v (!A ^ !Cin))
+;; (prefix->infix-symb (simplify-logic (n-arity (simplify-OR (simplify-AND (phase3-dnf (simplify-negation (move-in-negations (elim-implications  '(or (and Cin (not (or (and A (not #t)) (and (not A) #t)))) (and (not Cin) (or (and A (not #t)) (and (not A) #t))))))))))))) -> '((A ^ Cin) v (!A ^ !Cin))
 (define (simplify-AND expr)
   (cond
    ((symbol? expr) expr) ; symbol , ex: 'a
@@ -577,7 +577,7 @@
 
 ;; (enlight-dnf '(or (and c (not (or (and a (not b)) (and (not a) b)))) (and (not c) (or (and a (not b)) (and (not a) b))))) -> (a^b^c)v(!a^!b^c)v(!a^b^!c)v(a^!b^!c)
 (define (enlight-dnf expr)
-  (compact-display-bracket (prefix->infix-symb  (simplify-DNF-by-unitary-reduction (simplify (n-arity (simplify-OR (simplify-AND (dnf expr)))))))))
+  (compact-display-bracket (prefix->infix-symb  (simplify-DNF-by-unitary-reduction (simplify-logic (n-arity (simplify-OR (simplify-AND (dnf expr)))))))))
 
 
 
@@ -593,14 +593,14 @@
 ;;
 ;; (dnf-infix-symb '(((p . and . q) . => . r) . and . ((not (p . and . q)) . => . r))) -> 'r
 (define (dnf-infix-symb expr)
-  (prefix->infix-symb (simplify-DNF-by-unitary-reduction (simplify (n-arity (simplify-OR (simplify-AND (dnf (n-arity-operation->binary-operation expr)))))))))
+  (prefix->infix-symb (simplify-DNF-by-unitary-reduction (simplify-logic (n-arity (simplify-OR (simplify-AND (dnf (n-arity-operation->binary-operation expr)))))))))
 
 ;; put expression in DNF in n-arity and simplified
 ;;
 ;;  (dnf-n-arity-simp '(or (and (and a b) (not (and c (or (and a (not b)) (and (not a) b))))) (and (not (and a b)) (and c (or (and a (not b)) (and (not a) b)))))) -> '(or (and a b) (and (not a) b c) (and a (not b) c))
 ;;
 (define (dnf-n-arity-simp expr)
-  (simplify-DNF-by-unitary-reduction (simplify (n-arity (simplify-OR (simplify-AND (dnf (n-arity-operation->binary-operation expr))))))))
+  (simplify-DNF-by-unitary-reduction (simplify-logic (n-arity (simplify-OR (simplify-AND (dnf (n-arity-operation->binary-operation expr))))))))
 
 ;; (infix-symb-min-dnf '(or (and (not a) (not b) (not c) (not d)) (and (not a) (not b) (not c) d) (and (not a) (not b) c (not d)) (and (not a) b (not c) d)  (and (not a) b c (not d))  (and (not a) b c d)  (and a (not b) (not c) (not d)) (and a (not b) (not c) d)  (and a (not b) c (not d))   (and a b c (not d))))
 ;; '((!b ^ !c) v (c ^ !d) v (!a ^ b ^ d))
@@ -615,7 +615,7 @@
 ;; put an expression in CNF in infix with symbols and all the simplifications
 ;;  (cnf-infix-symb '(or (and c (not (or (and a (not b)) (and (not a) b)))) (and (not c) (or (and a (not b)) (and (not a) b))))) -> '((a v b v c) ^ (!a v !b v c) ^ (!a v b v !c) ^ (a v !b v !c))
 (define (cnf-infix-symb expr)
-  (prefix->infix-symb (simplify (n-arity (simplify-AND (simplify-OR (cnf (n-arity-operation->binary-operation expr))))))))
+  (prefix->infix-symb (simplify-logic (n-arity (simplify-AND (simplify-OR (cnf (n-arity-operation->binary-operation expr))))))))
 
 
 
@@ -791,17 +791,17 @@
 ;; simplify logical expressions by searching antilogies and tautologies in sub-expressions 
 ;; parameter : a normal form expression
 ;;
-;; (simplify (n-arity (cnf '(or (and c (not (or (and a (not b)) (and (not a) b)))) (and (not c) (or (and a (not b)) (and (not a) b)))))))
+;; (simplify-logic (n-arity (cnf '(or (and c (not (or (and a (not b)) (and (not a) b)))) (and (not c) (or (and a (not b)) (and (not a) b)))))))
 ;;    -> '(and (or a b c) (or (not a) (not b) c) (or (not a) b (not c)) (or a (not b) (not c)))
 ;;
-;; (simplify '(and b a b (not b))) -> #f
+;; (simplify-logic '(and b a b (not b))) -> #f
 ;;
-;; (simplify '(and (or ci b) a (or a a))) -> '(and a (or b ci)) 
+;; (simplify-logic '(and (or ci b) a (or a a))) -> '(and a (or b ci)) 
 ;; 
-;;  (simplify '(and (or (not ci) b) d (not d) (or a a))) -> #f
+;;  (simplify-logic '(and (or (not ci) b) d (not d) (or a a))) -> #f
 ;;
-;; (simplify '(and (or (not ci) b) (or d  d)  d (or (not d) (not d)) (or a a))) -> #f
-(define (simplify expr)
+;; (simplify-logic '(and (or (not ci) b) (or d  d)  d (or (not d) (not d)) (or a a))) -> #f
+(define (simplify-logic expr)
   (cond 
    ((null? expr) expr)
    ((symbol? expr) expr) 
@@ -1039,7 +1039,7 @@
 ;;    -> '((a and b) or (a and b and !c) or (a and !b and c) or (!a and b and c))
 ;;
 (define (simplify-n-arity-dnf expr)
-  (simplify (n-arity (simplify-OR (simplify-AND (simplify-DNF-by-unitary-reduction (dnf expr)))))))
+  (simplify-logic (n-arity (simplify-OR (simplify-AND (simplify-DNF-by-unitary-reduction (dnf expr)))))))
 
 
 

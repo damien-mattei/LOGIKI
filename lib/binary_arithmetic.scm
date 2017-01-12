@@ -69,7 +69,7 @@
 	 
       (set! poly-prefix (cons '+ (number->poly-base-2-rec n)))
       ;;(dv poly-prefix)
-      (set! poly-prefix-simp (simplify-algebra poly-prefix))
+      (set! poly-prefix-simp (simplify poly-prefix))
       ;;(dv poly-prefix-simp)
            
       poly-prefix-simp)))
@@ -114,7 +114,7 @@
 	 
       (set! poly-prefix (cons '+ (number->poly-base-k-rec n k)))
       (dv poly-prefix)
-      (set! poly-prefix-simp (simplify-algebra poly-prefix))
+      (set! poly-prefix-simp (simplify poly-prefix))
       (dv poly-prefix-simp)
            
       poly-prefix-simp)))
@@ -158,7 +158,7 @@
 	 
       (set! poly-prefix (cons '+ (number->poly-base-k-rec-expt n k)))
       (dv poly-prefix)
-      (set! poly-prefix-simp (simplify-algebra poly-prefix))
+      (set! poly-prefix-simp (simplify poly-prefix))
       (dv poly-prefix-simp)
            
       poly-prefix-simp)))
@@ -215,7 +215,7 @@
 	 
       (set! poly-prefix (cons '+ (number->hereditary-base-2-rec n)))
       (dv poly-prefix)
-      (set! poly-prefix-simp (simplify-algebra poly-prefix))
+      (set! poly-prefix-simp (simplify poly-prefix))
       (dv poly-prefix-simp)
       
       poly-prefix-simp)))
@@ -262,7 +262,7 @@
       
       (set! poly-prefix (cons '+ (number->hereditary-base-k-rec n k)))
       ;;(dv poly-prefix)
-      (set! poly-prefix-simp (simplify-algebra poly-prefix))
+      (set! poly-prefix-simp (simplify poly-prefix))
       ;;(dv poly-prefix-simp)
       
       poly-prefix-simp)))
@@ -332,7 +332,7 @@
       
       (set! poly-prefix (cons '+ (number->hereditary-base-k-rec-expt n k)))
       ;;(dv poly-prefix)
-      (set! poly-prefix-simp (simplify-algebra poly-prefix))
+      (set! poly-prefix-simp (simplify poly-prefix))
       ;;(dv poly-prefix-simp)
       
       poly-prefix-simp)))

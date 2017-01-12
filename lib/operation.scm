@@ -402,3 +402,6 @@
      (else (apply append (map collect-variables (args expr))))))
    symbol<?))
 
+
+(define (expt->^ expr)
+  (replace expr 'expt '^))
