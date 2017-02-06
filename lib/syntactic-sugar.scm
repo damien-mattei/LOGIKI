@@ -14,7 +14,7 @@
     ((_ tst ev)  (if tst ev '()))
     ((_ tst ev ...)  (if tst (begin ev ...) '()))))
 
-;; then and else do as beginners ;-)
+;; then and else do as begin-ners ;-)
 (define-syntax then
   (syntax-rules ()
     ((_ ev)  ev)

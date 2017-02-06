@@ -147,6 +147,12 @@
 (define (isADD? expr)
   (and (pair? expr) (ADD-op? (car expr))))
 
+(define (MULTIPLY-op? oper)
+  (or (eqv? oper *) (eqv? oper '*)))
+
+(define (isMULTIPLY? expr)
+  (and (pair? expr) (MULTIPLY-op? (car expr))))
+
 ;; test if an expression is a OR
 (define (isOR? expr)
   ;;(and (pair? expr) (equal? (car expr) 'or)))
@@ -281,8 +287,13 @@
 ;;        (or a (not b) a b)
 ;;        (or a (not b) (not b) (not a))
 ;;        (or a (not b) (not b) b))
-;;  >   
+;;     
 ;; (n-arity '(+ a (+ b c))) -> '(+ a b c)
+;;
+;; 
+;;(prefix->infix (n-arity (expt->^ (simplify (hereditary-base-monomial-1 '(expt 4 7))))))
+;; -> '((3 * (4 ^ 6)) + (3 * (4 ^ 5)) + (3 * (4 ^ 4)) + (3 * (4 ^ 3)) + (3 * (4 ^ 2)) + (3 * 4) + 3)
+;;
 (define (n-arity expr)
 
 
@@ -306,13 +317,22 @@
     (cons
      (operator expr)
      (list (n-arity (arg expr)))))
-   (else #;(binary-operation? expr) #;(or (isOR? expr) (isAND? expr))
-    (let ((opera (operator expr)))
-      (cons opera
-	    (apply
-	     append
-	     (map (make-collect-leaves-operator opera) (args expr))))))
+   ;;(else #;(binary-operation? expr) #;(or (isOR? expr) (isAND? expr))
+    ((or (isOR? expr)
+	 (isAND? expr)
+	 (isADD? expr)
+	 (isMULTIPLY? expr))
+     (let ((opera (operator expr)))
+       (cons opera
+	     (apply
+	      append
+	      (map (make-collect-leaves-operator opera) (args expr))))))
    
+    (else
+     (let ((opera (operator expr)))
+       (cons opera
+	     (map n-arity (args expr)))))
+
 	;;(list expr)))
    #;(else expr)))
 
@@ -347,6 +367,7 @@
 	  ((AND-op? oper) isAND?)
 	  ((OR-op? oper) isOR?)
 	  ((ADD-op? oper) isADD?)
+	  ((MULTIPLY-op? oper) isMULTIPLY?)
 	  (else (error "unknow operator : " oper)))))
 
     
