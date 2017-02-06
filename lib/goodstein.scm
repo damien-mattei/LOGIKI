@@ -785,7 +785,7 @@
 
 
 ;; decrement symbolic polynomial
-(define (symbolic-polynomial-1 hs) ;; hs : h successor
+(define (symbolic-polynomial-1 hs) ;; hs : h successor, g = symbolic-polynomial-1
 
   (let ((monomial '())
 	(monomial-1 '())
@@ -891,10 +891,12 @@
   
   ;;(dv P)
 
-  (cond ((number? P) ;; P = b -> b-1
+  ;; f : P -> P - 1 
+
+  (cond ((number? P) ;; P = b -> f(P) = b-1
 	 (- P 1))
 	
-	((is*? P) ;; P = c*b^n = (c-1)*b^n + b^n -> (c-1)*b^n + f(b^n)
+	((is*? P) ;; P = c.b^n = (c-1).b^n + b^n -> f(P) = f( (c-1).b^n + b^n ) = (c-1).b^n + f(b^n)
 	 (let* ((c (arg1 P))
 		(c-1 (- c 1))
 		(b^n (arg2 P)))
@@ -911,7 +913,8 @@
 		   (list (quote *) c-1 b^n)
 		   (hereditary-base-monomial-1 b^n))))))
 
-	(else ;; P = b^n = b*b^(n-1) = (b-1)*b^(n-1) + b^(n-1) -> (b-1)*b^(n-1) + f(b^(n-1))
+	(else ;; P = b^n = b.b^(n-1) = (b-1).b^(n-1) + b^(n-1) -> f(P) = f( (b-1).b^(n-1) + b^(n-1) )
+	 ;;                                                            = (b-1).b^(n-1) + f(b^(n-1)) with n-1 computed with g(n)
 	 (let* ((b (arg1 P))
 		(n (arg2 P))
 		(b-1 (- b 1))
