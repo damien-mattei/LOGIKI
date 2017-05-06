@@ -1608,6 +1608,31 @@
       (goodstein-rec (number->hereditary-base-k-expt n b)))))
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;; above is an atomic (package) set of functions
+
+
+
 ;; in recursive form:
 
 ;; take a monomial c.b^n and substract 1 
@@ -1711,6 +1736,7 @@
 ;; (prefix->infix (expt->^ (rec-monomial-1-power '(expt 6 4))))
 ;; '((5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * 6) + 5)
 
+;; TODO : iterative form
 (define (rec-monomial-1-power M) ;; f" = rec-monomial-1-power
   
   ;; property of x^n:
@@ -1755,6 +1781,8 @@
 ;; '((4 * (6 ^ 4)) + (5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * 6) + 5)
 ;;
 ;; (prefix->infix (expt->^ (monomial-1-product '(* 5 6)))) -> '((4 * 6) + 5)
+;;
+;; note: after product we call power (in general)
 (define (monomial-1-product M) ;; f' = monomial-1-product
   
   ;; M = (* c (^ b n)) = c.b^n = (c-1).b^n + b^n => f'(M) = f'( (c-1).b^n + b^n ) = (c-1).b^n + f"(b^n)
@@ -1842,7 +1870,7 @@
 		(if (and (number? P)
 			 (= P 0))
 
-		    0
+		    0 ;; finito
 	
 		    (let ((Pi '()) ;; infix expression
 			  (Ps '()) ;; hereditary base b+1 expression, historically was P successor
@@ -1850,7 +1878,7 @@
 			  (Pi-omega '())) ;; hereditary infix omega expression of Ps
 			  
 		      
-		      ;; convertir ,ne pas recalculer
+		      ;; convertir, ne pas recalculer
 		      (set! Pi (prefix->infix P))
 		      (set! Pi
 			    (replace Pi 'expt '^)) ;; expt))
@@ -1913,7 +1941,7 @@
 ;;
 ;; -COMPUTE m' = MONOMIAL - 1 = m - 1 :
 ;;  m' = f(m)
-;;  compute m' = Ck.b^k - 1 in hereditary base by calling recursive function f = hereditary-base-monomial-1
+;;  compute m' = Ck.b^k - 1 in hereditary base by calling recursive function f = hereditary-base-monomial-1sss
 ;;
 ;; NOW MONOMIAL-1 IS COMPUTED WE SET IT BACK IN POLYNOMIAL:
 ;;
