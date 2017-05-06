@@ -1,4 +1,6 @@
+;; useful macros 
 
+;; author: Damien Mattei
 
 ;; "if" "then" without "else"
 ;;  (if-t (= 1 1) 'good) -> 'good
@@ -20,7 +22,7 @@
     ((_ ev)  ev)
     ((_ ev ...) (begin ev ...))))
 
-;; commente pour Sidonie
+
 ;; (define-syntax else
 ;;   (syntax-rules ()
 ;;     ((_ ev)  ev)
@@ -32,6 +34,18 @@
   (syntax-rules ()
     ((_ pred b1 ...)
      (let loop () (when pred b1 ... (loop))))))
+
+;; > (define i 0) 
+;; > (do (display-nl "toto") (set! i (+ i 1)) while (< i 4)) 
+;; toto
+;; toto
+;; toto
+;; toto
+(define-syntax do
+  (syntax-rules (while)
+    ((do b1 ...
+       while pred)
+     (let loop () b1 ... (when pred (loop))))))
 
 
 ;; (define-syntax when
@@ -199,8 +213,8 @@
 
 
 ;; comment below for DrRacket Scheme,uncomment for MIT Scheme
-(define (rest lst)
-  (cdr lst))
+;;(define (rest lst)
+;;  (cdr lst))
 
 ;; for Bigloo Scheme :
 ;;(define (first lst)
@@ -225,4 +239,7 @@
 ;; (define (symbol<? s1 s2)
 ;;   (string<? (symbol->string s1) (symbol->string s2)))
 
+;; (define-syntax 1+
+;;   (syntax-rules ()
+;;     ((_ x)   (+ x 1))))
 

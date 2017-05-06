@@ -21,7 +21,7 @@
 ;;
 ;;
 ;;
-;; version 2.1
+;; version 2.2
 ;;
 ;;
 ;;    This program is free software: you can redistribute it and/or modify

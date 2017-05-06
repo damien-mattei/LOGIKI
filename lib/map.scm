@@ -389,14 +389,17 @@
 ;; the same as map-with-lambdas but will exclude from the result list the '() result of function
 ;;
 ;; (map-nil + '(1 2 3) '(4 5 6)) -> '(5 7 9)
+;; (map-nil (lambda (a b) (if (= a 2) '() (+ a b))) '() '(1 2 3) '(4 5 6)) -> '(5 9)
 (define map-nil
   (lambda (function list1 . more-lists)
-    (letrec ((some? (lambda (fct list)
-		      ;; returns #f if (function x) returns #t for 
-		      ;; some x in the list
-		      (and (pair? list)
-			   (or (fct (car list))
-			       (some? fct (cdr list)))))))
+    (letrec ((some?
+	      (lambda (fct list)
+		;; returns #t if (function x) returns #t for 
+		;; some x in the list
+		(and (pair? list)
+		     (or
+		      (fct (car list))
+		      (some? fct (cdr list)))))))
       
       ;; variadic map implementation terminates
       ;; when any of the argument lists is empty.
@@ -408,6 +411,319 @@
 		  (apply map-nil function (map cdr lists))
 		  (cons funct-result
 			(apply map-nil function (map cdr lists))))))))))
+
+;; map-nil-iter : a map version that exclude nil results
+;; the same as map-with-lambdas but will exclude from the result list the '() result of function
+;;
+;; (map-nil-iter + '() '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter (lambda (a b) (if (= a 2) '() (+ a b))) '() '(1 2 3) '(4 5 6)) -> '(5 9)
+(define map-nil-iter
+  
+  (lambda (function result list1 . more-lists)
+
+    (letrec ((some?
+	      (lambda (fct list)
+		;; returns #t if (function x) returns #t for 
+		;; some x in the list
+		(and (pair? list)
+		     (or
+		      (fct (car list))
+		      (some? fct (cdr list)))))))
+
+      
+      ;; variadic map implementation terminates
+      ;; when any of the argument lists is empty.
+      (let ((lists (cons list1 more-lists)))
+
+	(if (some? null? lists)
+	    result
+	    (let* ((funct-result (apply function (map car lists))))
+
+	      (if (null? funct-result)
+		  (apply map-nil-iter function result (map cdr lists))
+		  (apply
+		   map-nil-iter
+		   function
+		   (append result (list funct-result))
+		   (map cdr lists)))))))))
+
+
+;; (map-nil-iter-call +  '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3) '(4 5 6))  -> '(5 9)
+(define map-nil-iter-call
+  (lambda (function list1 . more-lists)
+    (apply map-nil-iter function '() (cons list1 more-lists))))
+
+
+
+;; map-nil-iter-optim : a map version that exclude nil results
+;; the same as map-with-lambdas but will exclude from the result list the '() result of function
+;;
+;; (map-nil-iter-optim + '() '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-optim (lambda (a b) (if (= a 2) '() (+ a b))) '() '(1 2 3) '(4 5 6)) -> '(5 9)
+(define map-nil-iter-optim
+  
+  (lambda (function result list1 . more-lists)
+
+    (letrec ((some?
+	      (lambda (fct list)
+		;; returns #t if (function x) returns #t for 
+		;; some x in the list
+		(and (pair? list)
+		     (or
+		      (fct (car list))
+		      (some? fct (cdr list)))))))
+
+      
+      ;; variadic map implementation terminates
+      ;; when any of the argument lists is empty.
+      (let ((lists (cons list1 more-lists)))
+
+	(if (some? null? lists)
+	    result
+	    (let* ((funct-result (apply function (map car lists))))
+
+	      (if (null? funct-result)
+
+		  (apply map-nil-iter-optim function result (map cdr lists))
+
+		  (apply
+		   map-nil-iter-optim
+		   function
+		   (cons funct-result result) ;; cons now create a reversed result list
+		   (map cdr lists)))))))))
+
+
+
+;; (map-nil-iter-optim-call +  '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-optim-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3) '(4 5 6))  -> '(5 9)
+(define map-nil-iter-optim-call
+  (lambda (function list1 . more-lists)
+    (reverse ;; cons had created a reversed result list
+     (apply map-nil-iter-optim function '() (cons list1 more-lists)))))
+
+
+
+;; map-nil-iter-optim-tail-calls : a map version that exclude nil results
+;; the same as map-with-lambdas but will exclude from the result list the '() result of function
+;;
+;; (map-nil-iter-optim-tail-calls + '() '((1 2 3) (4 5 6)))  -> '(9 7 5)
+;; (map-nil-iter-optim-tail-calls (lambda (a b) (if (= a 2) '() (+ a b))) '() '((1 2 3) (4 5 6))) -> '(9 5)
+(define map-nil-iter-optim-tail-calls
+  
+  (lambda (function result lists)
+    
+    (letrec ((some?
+	      (lambda (fct list)
+		;; returns #t if (function x) returns #t for 
+		;; some x in the list
+		(and (pair? list)
+		     (or
+		      (fct (car list))
+		      (some? fct (cdr list)))))))
+
+      
+      ;; variadic map implementation terminates
+      ;; when any of the argument lists is empty.
+      
+      (if (some? null? lists)
+	  
+	  result
+	  
+	  (let* ((funct-result (apply function (map car lists))))
+	    
+	    (if (null? funct-result)
+
+		(map-nil-iter-optim-tail-calls function result (map cdr lists))
+		
+		(map-nil-iter-optim-tail-calls
+		 function
+		 (cons funct-result result) ;; cons now create a reversed result list
+		 (map cdr lists))))))))
+
+
+;; (map-nil-iter-optim-tail-calls-call +  '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-optim-tail-calls-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3) '(4 5 6))  -> '(5 9)
+(define map-nil-iter-optim-tail-calls-call
+  (lambda (function list1 . more-lists)
+    (reverse ;; cons had created a reversed result list
+     (apply map-nil-iter-optim-tail-calls
+	    function
+	    '()
+	    (list
+	     (cons list1 more-lists))))))
+
+
+;; map-nil-iter-optim-tail-calls-fast : a map version that exclude nil results
+;; the same as map-with-lambdas but will exclude from the result list the '() result of function
+;;
+
+(define map-nil-iter-optim-tail-calls-fast
+  
+  (lambda (function lists)
+    
+    (letrec ((some?
+	      (lambda (fct list)
+		;; returns #t if (function x) returns #t for 
+		;; some x in the list
+		(and (pair? list)
+		     (or
+		      (fct (car list))
+		      (some? fct (cdr list)))))))
+
+      
+      ;; variadic map implementation terminates
+      ;; when any of the argument lists is empty.
+      
+      (if (some? null? lists)
+	  
+	  '()
+	  
+	  (let ((funct-result (apply function (map car lists))))
+	    
+	    (if (null? funct-result)
+
+		(map-nil-iter-optim-tail-calls-fast function (map cdr lists))
+		
+		(cons
+		 funct-result
+		 (map-nil-iter-optim-tail-calls-fast
+		  function
+		  (map cdr lists)))))))))
+
+
+;; (map-nil-iter-optim-tail-calls-fast-call +  '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-optim-tail-calls-fast-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3) '(4 5 6))  -> '(5 9)
+;; (map-nil-iter-optim-tail-calls-fast-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3 7) '(4 5 6)) -> '(5 9)
+(define map-nil-iter-optim-tail-calls-fast-call
+  (lambda (function list1 . more-lists)
+    (apply map-nil-iter-optim-tail-calls-fast
+	   function
+	   (list
+	    (cons list1 more-lists)))))
+
+
+;; map-nil-iter-optim-tail-calls-fast-no-nested-let : a map version that exclude nil results
+;; the same as map-with-lambdas but will exclude from the result list the '() result of function
+;;
+(define map-nil-iter-optim-tail-calls-fast-no-nested-let
+  
+  (lambda (function lists)
+          
+      ;; variadic map implementation terminates
+      ;; when any of the argument lists is empty.
+      
+      (if (some? null? lists)
+	  
+	  '()
+	    
+	    (if (null? (apply function (map car lists)))
+
+		(map-nil-iter-optim-tail-calls-fast-no-nested-let function (map cdr lists))
+		
+		(cons
+		 (apply function (map car lists))
+		 (map-nil-iter-optim-tail-calls-fast-no-nested-let
+		  function
+		  (map cdr lists)))))))
+
+
+;; (map-nil-iter-optim-tail-calls-fast-no-nested-let-call +  '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-optim-tail-calls-fast-no-nested-let-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3) '(4 5 6))  -> '(5 9)
+;; (map-nil-iter-optim-tail-calls-fast-no-nested-let-call (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3 4) '(5 6 7)) -> '(6 10)
+(define map-nil-iter-optim-tail-calls-fast-no-nested-let-call
+  (lambda (function list1 . more-lists)
+    (apply map-nil-iter-optim-tail-calls-fast-no-nested-let
+	   function
+	   (list
+	    (cons list1 more-lists)))))
+
+
+
+
+;; map-nil-iter-splice : a map version that exclude nil results
+;; the same as map-with-lambdas but will exclude from the result list the '() result of function
+;;
+;; (map-nil-iter-splice + '() '(1 2 3) '(4 5 6))  -> '(5 7 9)
+;; (map-nil-iter-splice (lambda (a b) (if (= a 2) '() (+ a b))) '() '(1 2 3) '(4 5 6)) -> '(5 9)
+;;
+;; WARNING: this version does not work!
+(define map-nil-iter-splice
+  
+  (lambda (function result list1 . more-lists)
+
+    (display-nl "map-nil-iter-splice : ")
+    
+    
+    (letrec ((some?
+	      (lambda (fct list)
+		;; returns #t if (function x) returns #t for 
+		;; some x in the list
+		(and (pair? list)
+		     (or
+		      (fct (car list))
+		      (some? fct (cdr list)))))))
+      
+      
+      ;; variadic map implementation terminates
+      ;; when any of the argument lists is empty.
+      (let ((lists (cons list1 more-lists)))
+
+	(dv lists)
+	
+	(if (some? null? lists)
+	    result
+	    (let* ((mcar-lists (map car lists))
+		   (mcdr-lists (map cdr lists))
+		   (ca-mcdr-lists (car mcdr-lists))
+		   (cd-mcdr-lists (cdr mcdr-lists))
+		   (funct-result 
+		    (begin
+		      (dv list1)
+		      (dv more-lists)
+		      (dv function)
+		      (dv result)
+		      (dv mcar-lists)
+		      (dv mcdr-lists)
+		      (dv ca-mcdr-lists)
+		      (dv cd-mcdr-lists)
+		      (apply function mcar-lists))))
+
+	      (if (null? funct-result)
+		  
+		    (eval `(,map-nil-iter-splice
+			    ,function
+			    ,result
+			    ,(car mcdr-lists) ,@(cdr mcdr-lists)))
+
+		    (eval `(,map-nil-iter-splice
+			    ,function
+			    ,(append result (list funct-result))
+			    ,(car mcdr-lists) ,@(cdr mcdr-lists))))))))))
+
+
+
+;; Chaw definition of map-nil
+;; (map/remove-nulls-1 (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3) '(4 5 6)) -> '(5 9)
+;;  (map/remove-nulls-1 (lambda (a b) (if (= a 2) '() (+ a b))) '(1 2 3 7) '(4 5 6)) -> '(5 9)
+(define (map/remove-nulls-1 proc . lsts)
+
+  (define (f lsts result)
+
+    (if (some? #;any null? lsts)
+
+        (reverse result)
+
+        (f (map cdr lsts)
+           (let ((proc-result (apply proc
+                                     (map car lsts))))
+             (if (null? proc-result)
+                 result
+                 (cons proc-result
+                       result))))))
+
+  (f lsts '()))
+
 
 
 ;; commented because already exist in DrRacket
@@ -454,6 +770,41 @@
         '()
         (cons (apply function (map1 car lists))
               (apply my-map function (map1 cdr lists))))))
+
+
+
+;; (my-map2 + '(1 2 3) '(4 5 6)) -> '(5 7 9)
+(define (my-map2 function list1 . more-lists)
+
+  (define (some? function list)
+    ;; returns #f if (function x) returns #t for 
+    ;; some x in the list
+    (and (pair? list)
+         (or (function (car list))
+             (some? function (cdr list)))))
+
+  (define (map1 function list)
+    ;; non-variadic map.  Returns a list whose elements
+    ;; the result of calling function with corresponding
+    ;; elements of list
+    (if (null? list)
+        '()
+        (cons (function (car list))
+              (map1 function (cdr list)))))
+  
+  ;; variadic map implementation terminates
+  ;; when any of the argument lists is empty.
+  (let ((lists (cons list1 more-lists)))
+    ;;(display-nl list1)
+    ;;(display-nl more-lists)
+    ;;(display-nl lists)
+    (if (some? null? lists)
+        '()
+        (cons (apply function (map1 car lists))
+              (apply my-map2 
+		     (cons 
+		      function
+		      (map1 cdr lists)))))))
 
 
 

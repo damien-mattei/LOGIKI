@@ -47,7 +47,8 @@
   (cond
    ((null? subset) #t) ;; empty subset always include in a set
    ((null? set) #f) ;; if subset is not empty and set is empty then result is false
-   (else (and (member (first subset) set) (include? (rest subset) set))))) ;; c include in L2 AND L1 include in L2
+   (else (and (member (first subset) set)
+	      (include? (rest subset) set))))) ;; c include in L2 AND L1 include in L2
 
 
 ;; set difference aA - B
@@ -139,3 +140,13 @@
   (cond ((null? s) s)
 	((null? (rest s)) '())
 	(else (append (list (list (first s) (first (rest s)))) (browse-set (rest s))))))
+
+
+;; returns #t if (function x) returns #t for 
+;; some x in the list
+(define some?
+  (lambda (fct list)
+    (and (pair? list)
+	 (or
+	  (fct (car list))
+	  (some? fct (cdr list))))))

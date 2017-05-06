@@ -2,7 +2,7 @@
 
 
 
-(include "simplify.scm")
+
 
 ;; binary list to true-false list
 ;; (binList2TrueFalseList '(1 1 0 1 0 0)) -> (#t #t #f #t #f #f)
@@ -424,6 +424,14 @@
 ;; (flag-set? #b100 #b11) -> #f
 (define (flag-set? f x)
   (= (bitwise-and f x) f))
+
+
+;; test the bit of k position
+;; (bit-test? #b101 2) -> #t
+;; (bit-test? #b101 1) -> #f
+(define (bit-test? x k)
+  (flag-set? (expt 2 k) x))
+
 
 ;; logarithme binaire
 (define (lb x)

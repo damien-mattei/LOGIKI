@@ -93,3 +93,42 @@
      (begin 
        task
        (display "")))))
+
+
+;; display in red in unix terminal only
+(define (display-red txt)
+  (begin
+    (display #\u1B)
+    (display "[31m")
+    (display txt)
+    (display #\u1B)
+    (display "[0m")))
+
+
+;; return a red string for unix terminal
+(define (string-red txt)
+  (string-append (string #\u1B)
+		 "[31m"
+		 txt
+		 (string #\u1B)
+		 "[0m"))
+
+
+(define (display-tail-in-red str n)
+  (string-append
+   (substring str 0 n)
+   (string-red (substring str
+			  n
+			  (string-length str)))))
+
+(define (display-tail-in-red-from-end str n)
+  (string-append
+   (substring str
+	      0
+	      (- (string-length str) n))
+   (string-red (substring str
+			  (- (string-length str) n)
+			  (string-length str)))))
+
+(define dtirfe display-tail-in-red-from-end)
+
