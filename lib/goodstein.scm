@@ -421,7 +421,7 @@
 
 (define (goodstein-symbolic n)
 
-  (let ((n-start n) ;; TODO : remove n-start
+  (let ((n-start n) ;; 
 	(h '()) ;; hereditary base b expression
 	(hi '()) ;; infix expression
 	(hs '()) ;; hereditary base b+1 expression
@@ -614,7 +614,7 @@
 ;; this version defines only 2 cases : polynomial (addition of monomial) and others (monomial or number)
 (define (goodstein-optim-enhanced-funct n)
 
-  (let ((n-start n) ;; TODO : remove n-start
+  (let ((n-start n) ;; 
 	(h '()) ;; hereditary base b expression
 	(hi '()) ;; infix expression
 	(hs '()) ;; hereditary base b+1 expression
@@ -712,7 +712,7 @@
 ;; P(266)(11)=((ω ^ (ω ^ (ω + 1))) + (5 * (ω ^ ω)) + (5 * (ω ^ 5)) + (5 * (ω ^ 4)) + (5 * (ω ^ 3)) + (5 * (ω ^ 2)) + (4 * ω) + 11)
 (define (symbolic-goodstein-optim-enhanced-funct n)
 
-  (let ((n-start n) ;; TODO : remove n-start
+  (let ((n-start n) 
 	(h '()) ;; hereditary base b expression
 	(hi '()) ;; infix expression
 	(hs '()) ;; hereditary base b+1 expression
@@ -1067,7 +1067,7 @@
 
 	
 	;; to be continued
-	;; TODO : verify the exponential is present (optional as it could not be otherwise)
+	
 	;;
 
 	;; M is a power:
@@ -1483,7 +1483,7 @@
 
 	
 	;; to be continued
-	;; TODO : verify the exponential is present (optional as it could not be otherwise)
+	
 	;;
 
 	;; M is a power:
@@ -1629,7 +1629,7 @@
 
 
 
-;; above is an atomic (package) set of functions
+;; below is an atomic (package) set of functions (this helps reading the program file)
 
 
 
@@ -1736,7 +1736,7 @@
 ;; (prefix->infix (expt->^ (rec-monomial-1-power '(expt 6 4))))
 ;; '((5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * 6) + 5)
 
-;; TODO : iterative form
+;; 
 (define (rec-monomial-1-power M) ;; f" = rec-monomial-1-power
   
   ;; property of x^n:
@@ -1747,7 +1747,7 @@
   ;; x^n = (x-1).x^(n-1) + (x-1).x^(n-2) + (x-1).x^(n-3) + ... + (x-1).x^3 + (x-1).x^2 + x^2
   ;; x^n = (x-1).x^(n-1) + (x-1).x^(n-2) + (x-1).x^(n-3) + ... + (x-1).x^3 + (x-1).x^2 + (x-1).x + x
 
-  ;; M = b^n = b.b^(n-1) = (b-1).b^(n-1) + b^(n-1) => f'(M) = f"( (b-1).b^(n-1) + b^(n-1) )
+  ;; M = b^n = b.b^(n-1) = (b-1).b^(n-1) + b^(n-1) => f"(M) = f"( (b-1).b^(n-1) + b^(n-1) )
   ;;                                                        = (b-1).b^(n-1) + f"(b^(n-1)) 
   ;;                                                        = (b-1).b^h(n)  + f"(b^h(n))
   
@@ -1765,11 +1765,16 @@
 	(simplify
 	 (n-arity ;; put in n-arity the expression
 	  (if (unity-symb? n-1) ;; if n-1 = 1
-	      
-	      `(+ ;; (b-1).b^h(n) + f"(b)
-		(* ,b-1 (expt ,b ,n-1))   ;; (b-1).b^(n-1)
-		;;,(rec-monomial-1-power b)) ;; f"(b)
-		,(- b 1)) ;; f"(b)
+
+	      (then-block
+	       (when debug-mode
+		     (display-nl "unity symbol !"))
+	       `(+ ;; (b-1).b^h(n) + f"(b)
+		 (* ,b-1 (expt ,b ,n-1))   ;; (b-1).b^(n-1)
+		 ;;,(rec-monomial-1-power b)) ;; f"(b)
+		 ;;,(- b 1)) ;; f"(b)
+		 ,b-1) ;; f"(b)
+	       )
 	      
 	      `(+  ;; (b-1).b^h(n) + f"(b^h(n))
 		(* ,b-1 (expt ,b ,n-1))    ;; (b-1).b^(n-1)
@@ -2095,4 +2100,79 @@
 	 (set! h_P monomial-1))
 
     h_P)) ;; return h(P) = h_P
+
+
+
+
+
+;; (prefix->infix (expt->^ (iter-monomial-1-power '(expt 6 4))))
+;; '((5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * 6) + 5)
+;;
+;; > (prefix->infix (expt->^ (iter-monomial-1-power '(expt 6 4))))
+;; '((5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * (6 ^ 1)) + (5 * (6 ^ 0)))
+;;
+;; > (prefix->infix (expt->^ (rec-monomial-1-power '(expt 6 4))))
+;; '((5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * 6) + 5)
+;; > (prefix->infix (expt->^ (iter-monomial-1-power '(expt 6 4))))
+;; '((5 * (6 ^ 3)) + (5 * (6 ^ 2)) + (5 * 6) + 5)
+;; > (prefix->infix (expt->^ (iter-monomial-1-power '(expt 6 2))))
+;; '((5 * 6) + 5)
+;; > (prefix->infix (expt->^ (iter-monomial-1-power '(expt 6 1))))
+;; 5
+;; > (prefix->infix (expt->^ (iter-monomial-1-power '(expt 6 0))))
+;; 0
+;;
+;; iterative form
+(define (iter-monomial-1-power M) ;; f"' = iter-monomial-1-power
+  
+  ;; property of x^n:
+
+  ;; x^n = x.x^(n-1) = (x-1+1).x^(n-1) = (x-1).x^(n-1) + x^(n-1)
+  ;;                                   = (x-1).x^(n-1) + (x-1).x^(n-2) + x^(n-2)
+  ;;                                   = (x-1).x^(n-1) + (x-1).x^(n-2) + (x-1).x^(n-3) + x^(n-3)
+  ;; x^n = (x-1).x^(n-1) + (x-1).x^(n-2) + (x-1).x^(n-3) + ... + (x-1).x^3 + (x-1).x^2 + x^2
+  ;; x^n = (x-1).x^(n-1) + (x-1).x^(n-2) + (x-1).x^(n-3) + ... + (x-1).x^3 + (x-1).x^2 + (x-1).x + x
+
+  ;; M = b^n = b.b^(n-1) = (b-1).b^(n-1) + b^(n-1) => f"'(M) = f"'( (b-1).b^(n-1) + b^(n-1) )
+  ;;                                                         = f"'( (b-1).b^h(n)  + b^h(n))
+  ;; f"'(M) = (b-1).b^(n-1) + (b-1).b^(n-2) + (b-1).b^(n-3) + ... + (b-1).b^3 + (b-1).b^2 + (b-1).b + b-1
+  
+  ;;  with n-1 computed with h(n) as n could be a polynomial,h=atomic-symbolic-polynomial-1
+
+  (if (number? M)
+      
+      (- M 1)
+      
+      (let* ((b (arg1 M))
+	     (n (arg2 M))
+	     (b-1 (- b 1))
+	     (n-1 (atomic-symbolic-polynomial-1 n)) ;; n-1 = h(n)
+	     (term-lst '()))
+
+	(if (unity-symb? n-1) ;; if n-1 = 1
+	      
+	    (simplify
+	     `(+ ;; (b-1).b^h(n) + f"(b)
+	       (* ,b-1 (expt ,b ,n-1))   ;; (b-1).b^(n-1)
+	       ;;,(rec-monomial-1-power b)) ;; f"(b)
+	       ;;,(- b 1))) ;; f"(b)
+	       ,b-1))
+	    
+	    (begin
+
+	      ;; init list
+	      ;; (set! term-lst
+	      ;; 	    (list `(* ,b-1 ,b) b-1)) ;; '( (b-1).b  b-1 )
+
+	      ;; iterate 
+	      (for (k 0 n-1)
+		   ;;(dv term-lst)
+		   (set! term-lst
+			 (cons `(* ,b-1 (expt ,b ,k)) ;; (b-1).b^k
+			       term-lst))) ;; ( (b-1).b^(k-1) (b-1).b^(k-2) (b-1).b^(k-3) ... (b-1).b^3 (b-1).b^2 (b-1).b b-1 )
+
+	      (simplify ;; formal simplification algorithm
+	       ;; add the + symbol
+	       (cons '+ term-lst))))))) ;; (b-1).b^k + (b-1).b^(k-1) + (b-1).b^(k-2) + (b-1).b^(k-3) + ... + (b-1).b^3 + (b-1).b^2 + (b-1).b + b-1
+	      
 
