@@ -2195,7 +2195,8 @@
 	      ;; 	    (list `(* ,b-1 ,b) b-1)) ;; '( (b-1).b  b-1 )
 
 	      ;; iterate 
-	      (for (k 0 n-1)
+	      (for (k 0 (eval n-1)) ;; eval correct an awful bug: n-1 is symbolically computed!
+		   ;; but we need the numeric value to compute the "for" loop
 		   ;;(dv term-lst)
 		   (set! term-lst
 			 (cons `(* ,b-1 (expt ,b ,k)) ;; (b-1).b^k
@@ -2230,7 +2231,7 @@
 ;;   M = (* c (^ b n)) = c.b^n = (c-1).b^n + b^n => f(M) = f( (c-1).b^n + b^n ) = (c-1).b^n + f(b^n) by (*)
 ;;       note: n could be equal to 1, so M could be equal to c.b
 
-;; M is a power: (note this doc is revursive version but in this part of code i will use iteration)
+;; M is a power: (note this doc is recursive version but in this part of code i will use iteration)
 ;;   M = b^n = b.b^(n-1) = (b-1).b^(n-1) + b^(n-1) => f(M) = f( (b-1).b^(n-1) + b^(n-1) )
 ;;                                                         = (b-1).b^(n-1) + f(b^(n-1))  by  (*)
 ;;                                                         = (b-1).b^h(n)  + f(b^h(n))
@@ -2801,3 +2802,64 @@
 ;; '((23 * 25) + 24)
 ;; > (prefix->infix (expt->^ (atomic-hereditary-base-monomial-1 '(* 12 25))))
 ;; '((11 * 25) + 24)
+
+
+;; > (prefix->infix (expt->^ (iter-atomic-symbolic-polynomial-1 '(* 2 5))))
+;; '(5 + 4)
+;; >
+;; prouve 2*b se transforme en 2*b' avec b'=b+1 , donc b' + b' ensuite en b' + b' -1
+;; b'-1 < b' donc converge a 0 ,restera alors b" au bout d'un moment puis b"-1 < b" qui converge a 0
+;; donc 2b a convergé a 0
+
+
+;; (prefix->infix (expt->^ (iter-atomic-symbolic-polynomial-1 '(* 3 5))))
+;; '((2 * 5) + 4)
+;; 3b convergera car 2b converge quelquesoit b
+
+;; donc on peut prouver que kb converge lorsque (k-1)b converge
+
+;; > (prefix->infix (expt->^ (iter-atomic-symbolic-polynomial-1 '(expt 7 2))))
+;; '((6 * 7) + 6)
+
+;; prouver que b^2 converge : comme kb avec k=b-1 converge  et c=b-1 converge b^2 converge CQFD
+
+;; (prefix->infix (expt->^ (iter-atomic-symbolic-polynomial-1 '(* 5 (expt 7 2)))))
+;; '((4 * (7 ^ 2)) + (6 * 7) + 6)
+
+;; prouver k.b^2 converge? (lorsque (k-1).b^2 converge)
+;; c.b^n = (c-1).b^n + b^n
+;;  k.b^2  = (k-1).b^2 + b^2 comme on a deja prouvé que  b^2 converge et qu'on comme hypothese
+;; que  (k-1).b^2 converge la somme converge aussi CQFD
+
+;; > (prefix->infix (expt->^ (iter-atomic-symbolic-polynomial-1 '(expt 7 3))))
+;; '((6 * (7 ^ 2)) + (6 * 7) + 6)
+
+;; de meme b^3 converge car kb^2, kb et k convergent donc leur somme aussi
+
+;; comment prouver que k.b^n converge ?
+;; k.b^n = (k-1).b^n + b^n
+;; f'(k.b^n) = k.b^n - 1
+;;   = (k-1).b^n + (b-1).b^(n-1) + (b-1).b^(n-2) + (b-1).b^(n-3) + ... + (b-1).b^3 + (b-1).b^2 + (b-1).b + b-1
+
+;; k.b^n = (k-1).b^n + (b-1).b^(n-1) + (b-1).b^(n-2) + (b-1).b^(n-3) + ... + (b-1).b^3 + (b-1).b^2 + (b-1).b + b
+;; sous quelles hypotheses? k.b^(n-1) , k.b^(n-2) .... k.b^2 converge 
+
+;;  b^n = (b-1).b^(n-1) + (b-1).b^(n-2) + (b-1).b^(n-3) + ... + (b-1).b^3 + (b-1).b^2 + (b-1).b + b
+;; recurence forte sur n : principe de recurrence forte? hypo  
+;; verifiees pour n=3 donné petit (k1.b^3 + k2.b^2 + k3.b + b converge , avec les k < b) comme hypothese seuil ensuite recurrence forte sur n 
+;; et recu simple sur k ensuite pour k.b^n = (k-1).b^n + b^n
+;; verifions d'abord que pour k=1 k.b^n converge:
+;; or b^n converge (demontre ailleur)
+;; par hypothese de recurrence on a : M_k-1 = (k-1).b^n montrons que M_k converge aussi:
+;; M_k = k.b^n = (k-1).b^n + b^n or on sait que M_k-1 = (k-1).b^n converge et aussi que b^n converge et la somme aussi
+
+
+;; TODO: debug !
+;; > (goodstein-init-atomic-iter 1200)
+;; G(1200)(1)=((2 ^ ((2 ^ (2 + 1)) + 2)) + (2 ^ ((2 ^ 2) + 2 + 1)) + (2 ^ ((2 ^ 2) + 1)) + (2 ^ (2 ^ 2)))
+;; P(1200)(1)=((ω ^ ((ω ^ (ω + 1)) + ω)) + (ω ^ ((ω ^ ω) + ω + 1)) + (ω ^ ((ω ^ ω) + 1)) + (ω ^ (ω ^ ω)))
+;; . . ../git/LOGIKI/lib/for.scm:70:13: <=: contract violation
+;;   expected: real?
+;;   given: '(+ (* 2 (expt 3 2)) (* 2 3) 2)
+;;   argument position: 2nd
+;;   other arguments.:
