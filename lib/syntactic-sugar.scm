@@ -243,3 +243,5 @@
 ;;   (syntax-rules ()
 ;;     ((_ x)   (+ x 1))))
 
+(define (atom? x)
+  (not (list? x)))
