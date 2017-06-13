@@ -1,4 +1,4 @@
-;;#lang racket
+#lang racket
 ;;#lang racket
 ;;#lang r5rs
 ;; #!r6rs
@@ -232,7 +232,12 @@
 
 (include "lib/display-formula.scm")
 
+;; for Goodstein functions
+(include "lib/tree.scm")
+
 (include "lib/goodstein.scm")
+
+(include "lib/goodstein-symbolic-recursive.scm")
 
 
 

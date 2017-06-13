@@ -17,7 +17,9 @@
 ;; Copyright (C) 2014-2017  Damien MATTEI
 ;;
 ;;
-;; damien.mattei@orange.fr
+;; e-mail: damien.mattei@gmail.com 
+;;         (damien.mattei@unice.fr , damien.mattei@oca.eu)
+;; 
 ;;
 ;;
 ;;
