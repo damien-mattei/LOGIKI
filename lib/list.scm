@@ -24,15 +24,15 @@
 ;; insert an element in a list (at the end) if the element is not already included in the list
 (define (insertNoDups element lst)
   (cond
-    ((empty? lst) (cons element lst))
-    ((equal? element (first lst)) lst)
-    (else (cons (first lst) (insertNoDups element (rest lst))))))
+   ((empty? lst) (cons element lst))
+   ((equal? element (first lst)) lst)
+   (else (cons (first lst) (insertNoDups element (rest lst))))))
 
 ;; (remove-duplicates '(a bc d e f a x y z d e t g)) -> '(g t e d z y x a f bc)
 (define (remove-duplicates lst)
   (cond
-    ((empty? lst) empty)
-    (else (insertNoDups (first lst) (remove-duplicates (rest lst))))))
+   ((empty? lst) empty)
+   (else (insertNoDups (first lst) (remove-duplicates (rest lst))))))
 
 
 (define (singleton-list? lst)
@@ -51,6 +51,27 @@
 (define (remove-duplicates-sorted sorted-lst)
   (reverse (remove-duplicates sorted-lst)))
 
+;; like 'uniq' UNIX command but on List 
+(define (uniq L)
+  (cond
+   ((null? L) '())
+   (else
+    (cons (car L)
+	  (uniq (remove (car L)
+			(cdr L)))))))
+
+;; remove all the c in '(c c c c c c ... L)
+(define (remove c L)
+  (cond
+   ((null? L) '())
+   ;; ((null? (cdr L)) (if (equal? c (car L))
+   ;; 			'()
+   ;; 			L))
+   ((not (equal? c (car L))) L)
+   (else
+    (remove c (cdr L)))))
+    
+   
 
 ;; remove last element of a list
 ;;
