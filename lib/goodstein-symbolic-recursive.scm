@@ -132,6 +132,32 @@
       (goodstein-rec (number->hereditary-base-k-expt n b)))))
 
 
+;; summary of upper comments:
+
+;; the Goodstein recursive function do:
+;;   - check if we have reached zero 
+;;   - display polynomial at each step
+;;   - bump the base (+1)
+;;   - decrement polynomial by calling symbolic-polynomial-1 function
+;;   - call (recursively) goodstein-rec
+
+;; the Goodstein recursive function do:
+;; .> - check if we have reached zero 
+;; |  - display polynomial at each step
+;; |  - bump the base (+1)
+;; |  - decrement polynomial by calling
+;; |
+;; |    -> h: rec-atomic-symbolic-polynomial-1 function which find the _lower_ _degree_ _monomial_ and call
+;; |
+;; |       -> rec-atomic-hereditary-base-monomial-1 which depending monomial call one of those functions:
+;; |          
+;; |          -> monomial-1-number (do M-1)
+;; |          -> monomial-1-product: f'( (c-1).b^n + b^n ) = (c-1).b^n + f"(b^n) which always call this function: 
+;; |                  \
+;; |          ->--->---`-> f" : rec-monomial-1-power
+;; |                         f"(b^n) =  (b-1).b^h(n)  + f"(b^h(n))
+;; |        
+;; |_ - recursively call itself
 
 
 

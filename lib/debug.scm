@@ -46,3 +46,44 @@
     ((_ instruction)
      (when debug-mode
 	   instruction))))
+
+
+
+;; display only if debug mode on for the functions below
+
+(define-syntax debug-display
+  (syntax-rules ()
+    ((_ obj) (if debug-mode (display obj)))
+    ((_ obj port) (if debug-mode (display obj port)))))
+
+
+;; an enhanced newline that will only "new line" in debug mode LOL
+(define-syntax debug-newline
+  (syntax-rules ()
+    ((_) (if debug-mode (newline)))))
+
+
+(define-syntax debug-display-var-nl 
+  (syntax-rules ()
+    ((_ msg var) (if debug-mode (display-var-nl msg var)))))
+
+;; debug with display-nl
+(define-syntax debug-display-nl 
+  (syntax-rules ()
+    ((_ msg)  (if debug-mode
+		  (begin (display msg) 
+			 (newline))))))
+
+;; continue with  display-msg-symb-nl
+;; macros or function to display a variable with a message and add a newline
+(define-syntax debug-display-msg-symb-nl 
+  (syntax-rules ()
+    ((_ msg symbl) (if debug-mode  
+		       (begin
+			 (display msg)
+			 (display " ")
+			 (display (symbol->string (quote symbl)))
+			 (display " = ")
+			 (display symbl)
+			 (newline))))))
+

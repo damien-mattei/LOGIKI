@@ -214,7 +214,7 @@
 
 (include "lib/debug.scm")
 
-(include "lib/display.scm")
+(include "lib/racket/display-racket-scheme.scm")
 
 (include "lib/array.scm")
 

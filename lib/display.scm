@@ -98,19 +98,19 @@
 ;; display in red in unix terminal only
 (define (display-red txt)
   (begin
-    (display #\u1B)
+    (display escape-char)
     (display "[31m")
     (display txt)
-    (display #\u1B)
+    (display escape-char)
     (display "[0m")))
 
 
 ;; return a red string for unix terminal
 (define (string-red txt)
-  (string-append (string #\u1B)
+  (string-append (string escape-char)
 		 "[31m"
 		 txt
-		 (string #\u1B)
+		 (string escape-char)
 		 "[0m"))
 
 
