@@ -2,7 +2,7 @@
 
 
 
-(define debug-mode #f) ;; global debug-mode definition (you can reset it in the function to debug to avoid a lot of information on display) 
+(define debug-mode #t) ;; global debug-mode definition (you can reset it in the function to debug to avoid a lot of information on display) 
 
 (define debug-mode-save debug-mode)
 
@@ -86,4 +86,27 @@
 			 (display " = ")
 			 (display symbl)
 			 (newline))))))
+
+
+;; tired of rewriting debug macros starting from normal ones i wrote this one that encapsulate ANY one !!!
+(define-syntax debug-only
+  (syntax-rules ()
+
+    ((_ fct-or-mac ...)
+     (begin
+       (display "debug-only : debug-mode = ")
+       (display debug-mode)
+       (newline)
+       (when debug-mode
+	     (fct-or-mac ...))))
+    
+    ((_ instruction)
+     (begin
+       (display "debug-only : debug-mode = ")
+       (display debug-mode)
+       (newline)
+       (when debug-mode
+	     (fct-or-mac))))))
+
+
 
