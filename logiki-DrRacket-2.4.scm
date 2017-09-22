@@ -9,7 +9,7 @@
 ;; uncomment above for DrRacket Scheme, leave commented for other Schemes
 ;;
 ;;
-;;            LOGIKI
+;;                    LOGIKI
 ;;
 ;;
 ;; a program to compute logic symbolically
