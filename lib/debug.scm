@@ -68,12 +68,18 @@
   (syntax-rules ()
     ((_ msg var) (if debug-mode (display-var-nl msg var)))))
 
+
 ;; debug with display-nl
 (define-syntax debug-display-nl 
   (syntax-rules ()
-    ((_ msg)  (if debug-mode
+    ((_ msg) (begin
+	       (display "debug.scm : debug-display-nl : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
+	       (display debug-mode)
+	       (newline)
+	       (if debug-mode
 		  (begin (display msg) 
-			 (newline))))))
+			 (newline)))))))
+
 
 ;; continue with  display-msg-symb-nl
 ;; macros or function to display a variable with a message and add a newline
@@ -95,7 +101,7 @@
 
     ((_ fct-or-mac ...)
      (begin
-       (display "debug-only : debug-mode = ")
+       (display "debug.scm : debug-only : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
        (display debug-mode)
        (newline)
        (when debug-mode
@@ -103,11 +109,11 @@
     
     ((_ instruction)
      (begin
-       (display "debug-only : debug-mode = ")
+       (display "debug.scm : debug-only : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
        (display debug-mode)
        (newline)
        (when debug-mode
-	     (fct-or-mac))))))
+	     (instruction))))))
 
 
 
