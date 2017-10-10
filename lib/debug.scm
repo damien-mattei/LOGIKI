@@ -1,9 +1,9 @@
 ;; debug Macros and Functions
-;; git test
+;; 
 
 
 
-(define debug-mode #t) ;; global debug-mode definition (you can reset it in the function to debug to avoid a lot of information on display) 
+(define debug-mode #t) ;; global debug-mode definition (you must set it in the function to debug to avoid a lot of information on display) 
 
 (define debug-mode-save debug-mode)
 
@@ -73,9 +73,9 @@
 (define-syntax debug-display-nl 
   (syntax-rules ()
     ((_ msg) (begin
-	       (display "debug.scm : debug-display-nl : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
-	       (display debug-mode)
-	       (newline)
+	       ;;(display "debug.scm : debug-display-nl : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
+	       ;;(display debug-mode)
+	       ;;(newline)
 	       (if debug-mode
 		  (begin (display msg) 
 			 (newline)))))))
@@ -100,20 +100,20 @@
   (syntax-rules ()
 
     ((_ fct-or-mac ...)
-     (begin
-       (display "debug.scm : debug-only : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
-       (display debug-mode)
-       (newline)
+     ;;(begin
+       ;;(display "debug.scm : debug-only : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
+       ;;(display debug-mode)
+       ;;(newline)
        (when debug-mode
-	     (fct-or-mac ...))))
+	     (fct-or-mac ...)));)
     
     ((_ instruction)
-     (begin
-       (display "debug.scm : debug-only : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
-       (display debug-mode)
-       (newline)
+     ;;(begin
+       ;;(display "debug.scm : debug-only : debug-mode = ") ;; this has been added for debugging the debug macros !!! (and should be removed later)
+       ;;(display debug-mode)
+       ;;(newline)
        (when debug-mode
-	     (instruction))))))
+	     (instruction)))));)
 
 
 
